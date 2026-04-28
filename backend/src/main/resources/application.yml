@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: choco-wholesale-backend
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/postgres?user=postgres&password=postgres&sslmode=disable}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:default-secret-change-me-in-production-must-be-at-least-64-chars-long!!}
+    access-expiration-ms: 3600000
+    refresh-expiration-ms: 604800000
+
+logging:
+  level:
+    org.hibernate.SQL: INFO
+    org.springframework.security: INFO

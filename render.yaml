@@ -1,0 +1,31 @@
+services:
+  # Backend - Spring Boot API
+  - type: web
+    name: jayanesh-agencies-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: singapore
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        value: jdbc:postgresql://aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?user=postgres.osmkeadqhdolkgeiweey&password=jay_ne_sh@12&sslmode=require&prepareThreshold=0
+      - key: JWT_SECRET
+        value: default-secret-change-me-in-production-must-be-at-least-64-chars-long!!
+      - key: SERVER_PORT
+        value: "8080"
+
+  # Admin Frontend - React + Vite
+  - type: web
+    name: jayanesh-agencies-admin
+    runtime: static
+    buildCommand: cd admin && npm install && npm run build
+    staticPublishPath: admin/dist
+    region: singapore
+    plan: free
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://jayanesh-agencies-api.onrender.com/api
