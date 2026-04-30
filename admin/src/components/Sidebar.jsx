@@ -16,7 +16,7 @@ export default function Sidebar() {
   return (
     <aside className="w-60 bg-slate-900 text-white flex flex-col min-h-screen">
       <div className="p-5 border-b border-slate-700">
-        <h1 className="text-lg font-bold tracking-tight">Choco Wholesale</h1>
+        <h1 className="text-lg font-bold tracking-tight">Jayanesh Agencies</h1>
         <p className="text-xs text-slate-400 mt-1">Admin Panel</p>
       </div>
 
@@ -41,7 +41,6 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-slate-700">
-        <div className="text-sm text-slate-300 mb-2">{user?.name}</div>
         <button
           onClick={logout}
           className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors cursor-pointer"
