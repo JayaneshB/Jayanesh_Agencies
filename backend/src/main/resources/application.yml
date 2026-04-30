@@ -32,6 +32,10 @@ management:
       show-details: never
 
 app:
+  admin:
+    email: ${ADMIN_EMAIL:admin@ja.in}
+    password: ${ADMIN_PASSWORD:asdfasdf}
+    name: ${ADMIN_NAME:Shop Owner}
   jwt:
     secret: ${JWT_SECRET:default-secret-change-me-in-production-must-be-at-least-64-chars-long!!}
     access-expiration-ms: 3600000

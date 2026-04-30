@@ -4,6 +4,7 @@ import com.chocowholesale.backend.entity.User;
 import com.chocowholesale.backend.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,15 @@ public class AdminBootstrap implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${app.admin.email}")
+    private String adminEmail;
+
+    @Value("${app.admin.password}")
+    private String adminPassword;
+
+    @Value("${app.admin.name}")
+    private String adminName;
+
     public AdminBootstrap(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -23,20 +33,20 @@ public class AdminBootstrap implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (!userRepository.existsByEmail("owner@yourshop.in")) {
+        if (!userRepository.existsByEmail(adminEmail)) {
             User admin = new User();
-            admin.setEmail("owner@yourshop.in");
-            admin.setPasswordHash(passwordEncoder.encode("ChangeMe123!"));
-            admin.setName("Shop Owner");
+            admin.setEmail(adminEmail);
+            admin.setPasswordHash(passwordEncoder.encode(adminPassword));
+            admin.setName(adminName);
             admin.setRole("ADMIN");
             userRepository.save(admin);
-            log.info("Admin user created: owner@yourshop.in");
+            log.info("Admin user created: {}", adminEmail);
         } else {
-            User admin = userRepository.findByEmail("owner@yourshop.in").orElse(null);
-            if (admin != null && !passwordEncoder.matches("ChangeMe123!", admin.getPasswordHash())) {
-                admin.setPasswordHash(passwordEncoder.encode("ChangeMe123!"));
+            User admin = userRepository.findByEmail(adminEmail).orElse(null);
+            if (admin != null && !passwordEncoder.matches(adminPassword, admin.getPasswordHash())) {
+                admin.setPasswordHash(passwordEncoder.encode(adminPassword));
                 userRepository.save(admin);
-                log.info("Admin user password reset to default");
+                log.info("Admin user password updated for: {}", adminEmail);
             }
         }
     }
