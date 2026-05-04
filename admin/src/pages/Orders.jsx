@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Eye } from 'lucide-react';
 import api from '../lib/api';
+import Loader from '../components/Loader';
 import OrderDetailModal from '../components/OrderDetailModal';
 
 const statuses = [
@@ -24,16 +25,21 @@ export default function Orders() {
   const [totalPages, setTotalPages] = useState(0);
   const [statusFilter, setStatusFilter] = useState('');
   const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
+    setLoading(true);
     const params = { page, size: 15, sort: 'createdAt,desc' };
     if (statusFilter) params.status = statusFilter;
     const { data } = await api.get('/admin/orders', { params });
     setOrders(data.content);
     setTotalPages(data.totalPages);
+    setLoading(false);
   }, [page, statusFilter]);
 
   useEffect(() => { load(); }, [load]);
+
+  if (loading) return <Loader />;
 
   return (
     <div>

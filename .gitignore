@@ -16,3 +16,6 @@ local.properties
 android/local.properties
 android/.gradle/
 android/app/build/
+.netlify/
+**/.netlify/
+dist/

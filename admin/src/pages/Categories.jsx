@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import api from '../lib/api';
+import Loader from '../components/Loader';
 
 export default function Categories() {
   const [categories, setCategories] = useState([]);
@@ -8,8 +9,9 @@ export default function Categories() {
   const [description, setDescription] = useState('');
   const [editing, setEditing] = useState(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const load = () => api.get('/admin/categories').then(r => setCategories(r.data));
+  const load = () => api.get('/admin/categories').then(r => { setCategories(r.data); setLoading(false); });
   useEffect(() => { load(); }, []);
 
   const handleSubmit = async (e) => {
@@ -39,6 +41,8 @@ export default function Categories() {
     await api.delete(`/admin/categories/${id}`);
     load();
   };
+
+  if (loading) return <Loader />;
 
   return (
     <div>

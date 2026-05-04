@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { DollarSign, ShoppingCart, Truck, AlertTriangle } from 'lucide-react';
 import api from '../lib/api';
+import Loader from '../components/Loader';
 
 function StatCard({ label, value, icon: Icon, color }) {
   return (
@@ -36,7 +37,7 @@ export default function Dashboard() {
     api.get('/admin/dashboard/recent-orders').then((r) => setRecentOrders(r.data));
   }, []);
 
-  if (!summary) return <div className="text-slate-500">Loading...</div>;
+  if (!summary) return <Loader />;
 
   return (
     <div>

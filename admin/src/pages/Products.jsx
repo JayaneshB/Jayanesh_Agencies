@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Plus, Search, Pencil, Trash2 } from 'lucide-react';
 import api from '../lib/api';
+import Loader from '../components/Loader';
 import ProductModal from '../components/ProductModal';
 
 export default function Products() {
@@ -10,16 +11,21 @@ export default function Products() {
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
+    setLoading(true);
     const params = { page, size: 15 };
     if (search) params.search = search;
     const { data } = await api.get('/admin/products', { params });
     setProducts(data.content);
     setTotalPages(data.totalPages);
+    setLoading(false);
   }, [page, search]);
 
   useEffect(() => { load(); }, [load]);
+
+  if (loading) return <Loader />;
 
   const handleDelete = async (id) => {
     if (!confirm('Deactivate this product?')) return;

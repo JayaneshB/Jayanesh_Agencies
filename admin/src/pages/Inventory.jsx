@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import api from '../lib/api';
+import Loader from '../components/Loader';
 
 export default function InventoryPage() {
   const [inventory, setInventory] = useState([]);
@@ -10,10 +11,11 @@ export default function InventoryPage() {
   const [reason, setReason] = useState('RESTOCK');
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const load = () => {
     const url = showLow ? '/admin/inventory/low-stock' : '/admin/inventory';
-    api.get(url).then(r => setInventory(r.data));
+    api.get(url).then(r => { setInventory(r.data); setLoading(false); });
   };
 
   useEffect(() => { load(); }, [showLow]);
@@ -35,6 +37,8 @@ export default function InventoryPage() {
       setSaving(false);
     }
   };
+
+  if (loading) return <Loader />;
 
   return (
     <div>
