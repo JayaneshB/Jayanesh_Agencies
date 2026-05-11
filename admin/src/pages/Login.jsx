@@ -29,97 +29,81 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#e0e7ff] via-[#eef2ff] to-[#c7d2fe] p-4">
-      <div className="relative w-full max-w-5xl">
-        
-        {/* Glow effect */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-3xl blur-2xl opacity-20"></div>
+    <div className="flex min-h-screen items-center justify-center p-4">
+      <div className="relative w-full max-w-6xl">
+        <div className="absolute -inset-1 rounded-[34px] bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-700 opacity-15 blur-2xl" />
 
-        {/* Card */}
-        <div className="relative bg-white rounded-3xl shadow-xl flex overflow-hidden">
-          
-          {/* LEFT PANEL */}
-          <div className="hidden md:flex w-1/2 bg-gradient-to-br from-blue-600 to-indigo-600 text-white p-10 flex-col justify-between">
-            <div>
-              <h2 className="text-3xl font-bold leading-snug mb-4">
-                Manage your sweets & chocolate business with ease.
-              </h2>
-              <p className="text-sm text-blue-100">
-                Streamline orders, track inventory, and grow your wholesale business from one powerful dashboard.
-              </p>
-            </div>
-
-            <div className="mt-6 w-full h-80 rounded-2xl overflow-hidden bg-white/10 flex items-center justify-center">
-              <img
-                src="/login-bg.jpg"
-                alt="Login illustration"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-
-          {/* RIGHT PANEL */}
-          <div className="w-full md:w-1/2 p-8 flex flex-col justify-center items-center">
-            <div className="w-full max-w-sm text-center">
-              
-              {/* Logo */}
-              <div className="flex items-center justify-center gap-2 mb-6">
-                <div className="w-10 h-10 flex items-center justify-center bg-blue-100 text-white rounded-full">
-                  🛒
-                </div>
-                <span className="font-semibold text-lg">
-                  Jayanesh Agencies
-                </span>
+        <div className="relative overflow-hidden rounded-[34px] border border-emerald-100 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+          <div className="grid min-h-[680px] md:grid-cols-2">
+            <div className="hidden flex-col justify-between bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 p-10 text-white md:flex">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200/70">Jayanesh Agencies</p>
+                <h2 className="mt-4 max-w-md text-4xl font-semibold leading-tight">
+                  Manage your sweets & chocolate business with ease.
+                </h2>
+                <p className="mt-4 max-w-md text-sm leading-6 text-emerald-100/80">
+                  Streamline orders, track inventory, and grow your wholesale business from one powerful dashboard.
+                </p>
               </div>
 
-              <h1 className="text-2xl font-bold text-slate-900">
-                Welcome Back
-              </h1>
+              <div className="overflow-hidden rounded-[28px] border border-white/10 bg-white/5 p-3 shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
+                <img src="/login-bg.jpg" alt="Login illustration" className="h-full w-full rounded-[22px] object-cover" />
+              </div>
+            </div>
 
-              <p className="text-sm text-slate-500 mb-6">
-                Please login to your account
-              </p>
-
-              {error && (
-                <div className="bg-red-50 text-red-600 text-sm rounded-lg p-3 mb-4 text-left">
-                  {error}
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit} className="space-y-4 text-left">
-                
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  placeholder="Email address"
-                  className="w-full px-4 py-3 rounded-xl bg-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  placeholder="Password"
-                  className="w-full px-4 py-3 rounded-xl bg-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-
-                <div className="pt-2">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-medium hover:opacity-90 transition shadow-md hover:shadow-lg disabled:opacity-50"
-                  >
-                    {loading ? 'Signing in...' : 'Login'}
-                  </button>
+            <div className="flex items-center justify-center p-8 md:p-10">
+              <div className="w-full max-w-md text-center">
+                <div className="mb-8 flex items-center justify-center gap-3">
+                  <div className="grid h-11 w-11 place-items-center rounded-full bg-emerald-100 text-emerald-700 shadow-sm">
+                    🛒
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-600">Wholesale Admin</p>
+                    <h1 className="text-lg font-semibold text-slate-900">Jayanesh Agencies</h1>
+                  </div>
                 </div>
 
-              </form>
+                <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Welcome Back</h1>
+                <p className="mt-2 text-sm text-slate-500">Please login to your account</p>
+
+                {error && (
+                  <div className="mt-6 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-left text-sm text-red-600">
+                    {error}
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="mt-6 space-y-4 text-left">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    placeholder="Email address"
+                    className="input-field"
+                  />
+
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    placeholder="Password"
+                    className="input-field"
+                  />
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="app-btn-primary w-full py-3.5 text-base"
+                    >
+                      {loading ? 'Signing in...' : 'Login'}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>

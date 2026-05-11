@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import api from '../lib/api';
+import { isMockModeEnabled, saveMockProduct } from '../lib/mockData';
 
 export default function ProductModal({ product, onClose, onSaved }) {
   const isEdit = !!product;
@@ -59,6 +60,11 @@ export default function ProductModal({ product, onClose, onSaved }) {
         })),
         imageUrls: form.imageUrls.filter(Boolean),
       };
+      if (isMockModeEnabled()) {
+        await saveMockProduct(product?.id || null, body);
+        onSaved();
+        return;
+      }
       if (isEdit) {
         await api.put(`/admin/products/${product.id}`, body);
       } else {
@@ -74,10 +80,10 @@ export default function ProductModal({ product, onClose, onSaved }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto m-4">
-        <div className="flex items-center justify-between px-6 py-4 border-b">
+      <div className="app-surface w-full max-w-lg max-h-[90vh] overflow-y-auto m-4">
+        <div className="app-card-head">
           <h2 className="text-lg font-semibold">{isEdit ? 'Edit Product' : 'New Product'}</h2>
-          <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"><X size={20} /></button>
+          <button onClick={onClose} className="p-1 text-slate-400 hover:text-emerald-600 cursor-pointer"><X size={20} /></button>
         </div>
 
         {error && <div className="mx-6 mt-4 bg-red-50 text-red-600 text-sm rounded-lg p-3">{error}</div>}
@@ -128,7 +134,7 @@ export default function ProductModal({ product, onClose, onSaved }) {
               </div>
             ))}
             <button type="button" onClick={() => set('pricingTiers', [...form.pricingTiers, { minQty: '', maxQty: '', price: '' }])}
-              className="text-sm text-indigo-600 hover:underline cursor-pointer">+ Add tier</button>
+              className="text-sm text-emerald-700 hover:underline cursor-pointer">+ Add tier</button>
           </div>
 
           <div>
@@ -139,7 +145,7 @@ export default function ProductModal({ product, onClose, onSaved }) {
               }} className="input-field mb-2" />
             ))}
             <button type="button" onClick={() => set('imageUrls', [...form.imageUrls, ''])}
-              className="text-sm text-indigo-600 hover:underline cursor-pointer">+ Add image</button>
+              className="text-sm text-emerald-700 hover:underline cursor-pointer">+ Add image</button>
           </div>
 
           <div className="flex items-center gap-2">
@@ -148,9 +154,9 @@ export default function ProductModal({ product, onClose, onSaved }) {
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-sm border rounded-lg hover:bg-slate-50 cursor-pointer">Cancel</button>
+            <button type="button" onClick={onClose} className="app-btn-secondary px-4 py-2 text-sm">Cancel</button>
             <button type="submit" disabled={saving}
-              className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 cursor-pointer">
+              className="app-btn-primary px-4 py-2 text-sm disabled:opacity-50">
               {saving ? 'Saving...' : isEdit ? 'Update' : 'Create'}
             </button>
           </div>

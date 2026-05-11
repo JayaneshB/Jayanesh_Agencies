@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import api from '../lib/api';
 import Loader from '../components/Loader';
+import { adjustMockInventory, getMockInventory, isMockModeEnabled } from '../lib/mockData';
 
 export default function InventoryPage() {
   const [inventory, setInventory] = useState([]);
@@ -14,6 +15,10 @@ export default function InventoryPage() {
   const [loading, setLoading] = useState(true);
 
   const load = () => {
+    if (isMockModeEnabled()) {
+      getMockInventory({ lowOnly: showLow }).then((rows) => { setInventory(rows); setLoading(false); });
+      return;
+    }
     const url = showLow ? '/admin/inventory/low-stock' : '/admin/inventory';
     api.get(url).then(r => { setInventory(r.data); setLoading(false); });
   };
@@ -24,6 +29,12 @@ export default function InventoryPage() {
     e.preventDefault();
     setSaving(true);
     try {
+      if (isMockModeEnabled()) {
+        await adjustMockInventory(adjusting, parseInt(qty), reason, note || null);
+        setAdjusting(null); setQty(''); setNote('');
+        load();
+        return;
+      }
       await api.post(`/admin/inventory/${adjusting}/adjust`, {
         quantity: parseInt(qty),
         reason,
@@ -41,22 +52,26 @@ export default function InventoryPage() {
   if (loading) return <Loader />;
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Inventory</h1>
+    <div className="space-y-6">
+      <div className="app-surface flex flex-wrap items-center justify-between gap-4 px-6 py-5">
+        <div>
+          <p className="text-sm font-medium uppercase tracking-[0.18em] text-emerald-700">Operations</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Inventory</h1>
+          <p className="mt-2 text-sm text-slate-500">Track stock balances and adjust quantities with the same streamlined panel style.</p>
+        </div>
         <button
           onClick={() => setShowLow(!showLow)}
-          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border cursor-pointer ${showLow ? 'bg-red-50 border-red-200 text-red-700' : 'hover:bg-slate-50'}`}
+          className={`app-btn-secondary ${showLow ? 'border-red-200 bg-red-50 text-red-700 hover:bg-red-50' : ''}`}
         >
           <AlertTriangle size={16} /> {showLow ? 'Show All' : 'Low Stock Only'}
         </button>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="app-table-card">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-slate-50 text-left text-slate-600">
+              <tr className="app-table-head">
                 <th className="px-5 py-3 font-medium">Product</th>
                 <th className="px-5 py-3 font-medium text-center">Total</th>
                 <th className="px-5 py-3 font-medium text-center">Reserved</th>
@@ -69,7 +84,7 @@ export default function InventoryPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {inventory.map(inv => (
-                <tr key={inv.id} className="hover:bg-slate-50">
+                <tr key={inv.id} className="app-table-row">
                   <td className="px-5 py-3 font-medium text-slate-900">{inv.productName}</td>
                   <td className="px-5 py-3 text-center">{inv.totalStock}</td>
                   <td className="px-5 py-3 text-center">{inv.reserved}</td>
@@ -83,7 +98,7 @@ export default function InventoryPage() {
                   <td className="px-5 py-3 text-center">{inv.moq}</td>
                   <td className="px-5 py-3 text-right">
                     <button onClick={() => setAdjusting(inv.productId)}
-                      className="px-3 py-1 text-xs bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 cursor-pointer">
+                      className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 transition hover:bg-emerald-100 cursor-pointer">
                       Adjust
                     </button>
                   </td>
@@ -99,19 +114,19 @@ export default function InventoryPage() {
 
       {adjusting && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm m-4 p-6">
+          <div className="app-surface w-full max-w-sm m-4 p-6">
             <h2 className="text-lg font-semibold mb-4">Adjust Stock</h2>
             <form onSubmit={handleAdjust} className="space-y-3">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Quantity (+/-)</label>
                 <input type="number" value={qty} onChange={e => setQty(e.target.value)} required
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="input-field"
                   placeholder="e.g. 50 or -10" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Reason</label>
                 <select value={reason} onChange={e => setReason(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  className="input-field">
                   <option>RESTOCK</option>
                   <option>RETURN</option>
                   <option>DAMAGE</option>
@@ -122,12 +137,12 @@ export default function InventoryPage() {
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Note</label>
                 <input value={note} onChange={e => setNote(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  className="input-field" />
               </div>
               <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setAdjusting(null)} className="px-4 py-2 text-sm border rounded-lg hover:bg-slate-50 cursor-pointer">Cancel</button>
+                <button type="button" onClick={() => setAdjusting(null)} className="app-btn-secondary px-4 py-2 text-sm">Cancel</button>
                 <button type="submit" disabled={saving}
-                  className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 cursor-pointer">
+                  className="app-btn-primary px-4 py-2 text-sm disabled:opacity-50">
                   {saving ? 'Saving...' : 'Apply'}
                 </button>
               </div>

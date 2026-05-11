@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import api from '../lib/api';
+import { isMockModeEnabled, updateMockOrderStatus } from '../lib/mockData';
 
 const nextStatuses = {
   PENDING_PAYMENT: ['CONFIRMED', 'CANCELLED'],
@@ -23,6 +24,11 @@ export default function OrderDetailModal({ order, onClose, onUpdated }) {
     setSaving(true);
     setError('');
     try {
+      if (isMockModeEnabled()) {
+        await updateMockOrderStatus(order.id, newStatus, reason || null);
+        onUpdated();
+        return;
+      }
       await api.patch(`/admin/orders/${order.id}/status`, { status: newStatus, reason: reason || null });
       onUpdated();
     } catch (err) {
@@ -34,10 +40,10 @@ export default function OrderDetailModal({ order, onClose, onUpdated }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto m-4">
-        <div className="flex items-center justify-between px-6 py-4 border-b">
+      <div className="app-surface w-full max-w-lg max-h-[90vh] overflow-y-auto m-4">
+        <div className="app-card-head">
           <h2 className="text-lg font-semibold">Order Details</h2>
-          <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"><X size={20} /></button>
+          <button onClick={onClose} className="p-1 text-slate-400 hover:text-emerald-600 cursor-pointer"><X size={20} /></button>
         </div>
 
         <div className="p-6 space-y-4">
@@ -80,21 +86,21 @@ export default function OrderDetailModal({ order, onClose, onUpdated }) {
           {allowed.length > 0 && (
             <div className="border-t pt-4">
               <h3 className="text-sm font-semibold text-slate-700 mb-2">Update Status</h3>
-              {error && <div className="bg-red-50 text-red-600 text-sm rounded-lg p-2 mb-2">{error}</div>}
+              {error && <div className="mb-2 rounded-2xl border border-red-100 bg-red-50 p-2 text-sm text-red-600">{error}</div>}
               <div className="flex gap-2 mb-2">
                 {allowed.map(s => (
                   <button key={s} onClick={() => setNewStatus(s)}
-                    className={`px-3 py-1.5 text-xs rounded-lg border cursor-pointer ${newStatus === s ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-slate-50'}`}>
+                    className={`px-3 py-1.5 text-xs rounded-full border cursor-pointer ${newStatus === s ? 'bg-emerald-600 text-white border-emerald-600' : 'hover:bg-slate-50'}`}>
                     {s.replace(/_/g, ' ')}
                   </button>
                 ))}
               </div>
               {newStatus === 'CANCELLED' && (
                 <input placeholder="Reason for cancellation" value={reason} onChange={e => setReason(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  className="input-field mb-2" />
               )}
               <button onClick={handleUpdate} disabled={!newStatus || saving}
-                className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 cursor-pointer">
+                className="app-btn-primary px-4 py-2 text-sm disabled:opacity-50">
                 {saving ? 'Updating...' : 'Confirm'}
               </button>
             </div>

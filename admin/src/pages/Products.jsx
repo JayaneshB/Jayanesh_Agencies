@@ -3,6 +3,7 @@ import { Plus, Search, Pencil, Trash2 } from 'lucide-react';
 import api from '../lib/api';
 import Loader from '../components/Loader';
 import ProductModal from '../components/ProductModal';
+import { getMockProductsPage, isMockModeEnabled, deleteMockProduct } from '../lib/mockData';
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -15,12 +16,22 @@ export default function Products() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const params = { page, size: 15 };
-    if (search) params.search = search;
-    const { data } = await api.get('/admin/products', { params });
-    setProducts(data.content);
-    setTotalPages(data.totalPages);
-    setLoading(false);
+    try {
+      if (isMockModeEnabled()) {
+        const data = await getMockProductsPage({ page, size: 15, search });
+        setProducts(data.content);
+        setTotalPages(data.totalPages);
+        return;
+      }
+
+      const params = { page, size: 15 };
+      if (search) params.search = search;
+      const { data } = await api.get('/admin/products', { params });
+      setProducts(data.content);
+      setTotalPages(data.totalPages);
+    } finally {
+      setLoading(false);
+    }
   }, [page, search]);
 
   useEffect(() => { load(); }, [load]);
@@ -29,38 +40,47 @@ export default function Products() {
 
   const handleDelete = async (id) => {
     if (!confirm('Deactivate this product?')) return;
+    if (isMockModeEnabled()) {
+      await deleteMockProduct(id);
+      load();
+      return;
+    }
     await api.delete(`/admin/products/${id}`);
     load();
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Products</h1>
+    <div className="space-y-6">
+      <div className="app-surface flex flex-wrap items-center justify-between gap-4 px-6 py-5">
+        <div>
+          <p className="text-sm font-medium uppercase tracking-[0.18em] text-emerald-700">Catalog</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Products</h1>
+          <p className="mt-2 text-sm text-slate-500">Add, edit, and review product inventory with the same design language across the panel.</p>
+        </div>
         <button
           onClick={() => { setEditing(null); setShowModal(true); }}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors cursor-pointer"
+          className="app-btn-primary"
         >
           <Plus size={16} /> Add Product
         </button>
       </div>
 
-      <div className="relative mb-4">
+      <div className="relative">
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
         <input
           type="text"
           placeholder="Search products..."
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-          className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="input-field !rounded-full !pl-10"
         />
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="app-table-card">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-slate-50 text-left text-slate-600">
+              <tr className="app-table-head">
                 <th className="px-5 py-3 font-medium">Name</th>
                 <th className="px-5 py-3 font-medium">Category</th>
                 <th className="px-5 py-3 font-medium text-right">Price (min)</th>
@@ -71,7 +91,7 @@ export default function Products() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {products.map((p) => (
-                <tr key={p.id} className="hover:bg-slate-50">
+                <tr key={p.id} className="app-table-row">
                   <td className="px-5 py-3 font-medium text-slate-900">{p.name}</td>
                   <td className="px-5 py-3 text-slate-500">{p.categoryName || '—'}</td>
                   <td className="px-5 py-3 text-right">
@@ -86,7 +106,7 @@ export default function Products() {
                     <span className={`inline-block w-2.5 h-2.5 rounded-full ${p.isActive ? 'bg-green-500' : 'bg-slate-300'}`} />
                   </td>
                   <td className="px-5 py-3 text-right space-x-1">
-                    <button onClick={() => { setEditing(p); setShowModal(true); }} className="p-1.5 text-slate-400 hover:text-indigo-600 cursor-pointer"><Pencil size={15} /></button>
+                    <button onClick={() => { setEditing(p); setShowModal(true); }} className="p-1.5 text-slate-400 hover:text-emerald-600 cursor-pointer"><Pencil size={15} /></button>
                     <button onClick={() => handleDelete(p.id)} className="p-1.5 text-slate-400 hover:text-red-600 cursor-pointer"><Trash2 size={15} /></button>
                   </td>
                 </tr>
@@ -101,9 +121,9 @@ export default function Products() {
 
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 mt-4">
-          <button disabled={page === 0} onClick={() => setPage(p => p - 1)} className="px-3 py-1.5 border rounded-lg text-sm disabled:opacity-40 cursor-pointer">Prev</button>
+          <button disabled={page === 0} onClick={() => setPage(p => p - 1)} className="app-btn-secondary px-4 py-2 text-sm disabled:opacity-40">Prev</button>
           <span className="text-sm text-slate-500">Page {page + 1} of {totalPages}</span>
-          <button disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)} className="px-3 py-1.5 border rounded-lg text-sm disabled:opacity-40 cursor-pointer">Next</button>
+          <button disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)} className="app-btn-secondary px-4 py-2 text-sm disabled:opacity-40">Next</button>
         </div>
       )}
 

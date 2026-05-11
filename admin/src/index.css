@@ -1,5 +1,81 @@
 @import "tailwindcss";
 
+:root {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, rgba(16, 185, 129, 0.09), transparent 30%),
+    linear-gradient(180deg, #f5f8f4 0%, #eef4ef 100%);
+  color: #122015;
+}
+
 .input-field {
-  @apply w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent;
+  @apply w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100;
+}
+
+@layer components {
+  .app-shell {
+    @apply min-h-screen text-slate-800;
+  }
+
+  .app-surface {
+    @apply rounded-[28px] border border-emerald-100 bg-white shadow-[0_10px_40px_rgba(15,23,42,0.05)];
+  }
+
+  .app-soft-surface {
+    @apply rounded-[24px] border border-emerald-100/70 bg-emerald-50/55;
+  }
+
+  .app-heading {
+    @apply text-3xl font-semibold tracking-tight text-slate-900;
+  }
+
+  .app-subheading {
+    @apply text-sm text-slate-500;
+  }
+
+  .app-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .app-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-emerald-200 bg-white px-5 py-2.5 text-sm font-medium text-emerald-900 transition hover:bg-emerald-50;
+  }
+
+  .app-chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-800;
+  }
+
+  .app-card-head {
+    @apply flex items-center justify-between gap-3 border-b border-emerald-100 px-5 py-4;
+  }
+
+  .app-card-title {
+    @apply text-lg font-semibold text-slate-900;
+  }
+
+  .app-table-card {
+    @apply overflow-hidden rounded-[28px] border border-emerald-100 bg-white shadow-sm;
+  }
+
+  .app-table-head {
+    @apply bg-slate-50 text-left text-xs font-medium uppercase tracking-[0.14em] text-slate-500;
+  }
+
+  .app-table-row {
+    @apply border-b border-slate-100 transition hover:bg-emerald-50/40;
+  }
+
+  .app-kpi-card {
+    @apply rounded-[26px] border border-emerald-100 bg-white p-5 shadow-sm;
+  }
 }
